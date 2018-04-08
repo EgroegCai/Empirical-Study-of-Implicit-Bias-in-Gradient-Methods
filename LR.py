@@ -3,12 +3,14 @@ import numpy as np
 import random
 import matplotlib.pyplot as plt
 
+# random.seed(42)
+
 k = 3
 n = 16
 X = np.ones((n,k))
 Y = np.ones(n)
 w = np.ones(k)
-T = 1e5
+T = 1e3
 
 # Support vectors
 # ==================================
@@ -52,17 +54,16 @@ def gradient_descent(w,X,Y,T):
     eta = 1.0/(S[0])
     print("eta = %.4f" % eta)
     for t in xrange(int(T)):
-        # if t % (int(T)/10) == 0:
-        # print(w)
+        if t % (int(T)/10) == 0: print('{} {}'.format(t,w))
         temp = np.zeros(k)
         for i in xrange(n):
             # print("WX_%d = %.4f" % (i,(w.transpose().dot(X[i]))))
-            temp += Y[i]*X[i]-np.exp(w.transpose().dot(X[i]))/(1+np.exp(w.transpose().dot(X[i])))*X[i]
+            temp += (1+Y[i])/2*X[i]-np.exp(w.transpose().dot(X[i]))/(1+np.exp(w.transpose().dot(X[i])))*X[i]
         # print("temp = ",temp)
         # we probabily need to normalize w to prevent overflow
-        w = w-eta*temp
-        w = w/np.linalg.norm(w,ord=2)
-    # print(w)
+        w += eta*temp
+        # w = w/np.linalg.norm(w,ord=2)
+    print(w)
     return w
 
 
