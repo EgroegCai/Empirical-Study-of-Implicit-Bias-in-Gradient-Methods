@@ -22,7 +22,6 @@ Y[2] = -1
 Y[3] = -1
 # ==================================
 
-
 # linear transformation for creating random data points
 M = np.matrix([[1.0,1.0],[-1.0,1.0]])
 for i in xrange(4,n):
@@ -38,8 +37,7 @@ for i in xrange(4,n):
         X[i][0:2] = M.transpose().dot(np.array([x_1,x_2]))
         Y[i] = 1
 
-# plt.scatter(X.transpose()[0],X.transpose().[1])
-# plt.show()
+plt.scatter(X.transpose()[0],X.transpose()[1])
 
 
 def logistic_regression_loss(w,X,Y):
@@ -55,7 +53,7 @@ def gradient_descent(w,X,Y,T):
     print("eta = %.4f" % eta)
     for t in xrange(int(T)):
         # if t % (int(T)/10) == 0:
-        print(w)
+        # print(w)
         temp = np.zeros(k)
         for i in xrange(n):
             # print("WX_%d = %.4f" % (i,(w.transpose().dot(X[i]))))
@@ -64,10 +62,18 @@ def gradient_descent(w,X,Y,T):
         # we probabily need to normalize w to prevent overflow
         w = w-eta*temp
         w = w/np.linalg.norm(w,ord=2)
-    print(w)
+    # print(w)
     return w
 
-gradient_descent(w,X,Y,T)
-        
 
+w_star = gradient_descent(w,X,Y,T)
+Xs = np.array([0.1*i - 3 for i in range(60)])
+Ys = (-w_star[2] - w_star[0]*Xs)/w_star[1]
+plt.plot(Xs,Ys)
+
+Xact = np.array([0.1*i - 3 for i in range(60)])
+Yact =  - Xact
+plt.plot(Xact,Yact, 'g^')
+
+plt.show()        
 
