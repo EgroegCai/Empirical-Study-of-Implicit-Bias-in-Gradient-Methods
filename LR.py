@@ -3,12 +3,14 @@ import numpy as np
 import random
 import matplotlib.pyplot as plt
 
+# random.seed(42)
+
 k = 3
 n = 16
 X = np.ones((n,k))
 Y = np.ones(n)
 w = np.ones(k)
-T = 1e5
+T = 1e3
 
 # Support vectors
 # ==================================
@@ -21,7 +23,6 @@ Y[1] = 1
 Y[2] = -1
 Y[3] = -1
 # ==================================
-
 
 # linear transformation for creating random data points
 M = np.matrix([[1.0,1.0],[-1.0,1.0]])
@@ -38,8 +39,7 @@ for i in xrange(4,n):
         X[i][0:2] = M.transpose().dot(np.array([x_1,x_2]))
         Y[i] = 1
 
-# plt.scatter(X.transpose()[0],X.transpose().[1])
-# plt.show()
+plt.scatter(X.transpose()[0],X.transpose()[1])
 
 
 def logistic_regression_loss(w,X,Y):
@@ -54,20 +54,27 @@ def gradient_descent(w,X,Y,T):
     eta = 1.0/(S[0])
     print("eta = %.4f" % eta)
     for t in xrange(int(T)):
-        # if t % (int(T)/10) == 0:
-        print(w)
+        if t % (int(T)/10) == 0: print('{} {}'.format(t,w))
         temp = np.zeros(k)
         for i in xrange(n):
             # print("WX_%d = %.4f" % (i,(w.transpose().dot(X[i]))))
-            temp += Y[i]*X[i]-np.exp(w.transpose().dot(X[i]))/(1+np.exp(w.transpose().dot(X[i])))*X[i]
+            temp += (1+Y[i])/2*X[i]-np.exp(w.transpose().dot(X[i]))/(1+np.exp(w.transpose().dot(X[i])))*X[i]
         # print("temp = ",temp)
         # we probabily need to normalize w to prevent overflow
-        w = w-eta*temp
-        w = w/np.linalg.norm(w,ord=2)
+        w += eta*temp
+        # w = w/np.linalg.norm(w,ord=2)
     print(w)
     return w
 
-gradient_descent(w,X,Y,T)
-        
 
+w_star = gradient_descent(w,X,Y,T)
+Xs = np.array([0.1*i - 3 for i in range(60)])
+Ys = (-w_star[2] - w_star[0]*Xs)/w_star[1]
+plt.plot(Xs,Ys)
+
+Xact = np.array([0.1*i - 3 for i in range(60)])
+Yact =  - Xact
+plt.plot(Xact,Yact, 'g^')
+
+plt.show()        
 
