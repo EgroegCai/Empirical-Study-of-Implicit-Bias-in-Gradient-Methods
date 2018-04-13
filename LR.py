@@ -1,6 +1,6 @@
 import math
 import random
-
+import matplotlib.pyplot as plt
 import numpy as np
 from numpy.linalg import norm
 
@@ -11,31 +11,31 @@ n = 16
 X = np.ones((n, k))
 Y = np.ones(n)
 w = np.zeros(k)
-T = int(1e6)
+T = int(1e3)
 w_svm = np.array([1 / np.sqrt(2), 1 / np.sqrt(2), 0.0])
 
 # Support vectors
 # ==================================
 X[0] = np.array([0.5, 1.5, 1.0])
-X[1] = np.array([1.5, 0.5, 1.0])
-X[2] = np.array([-0.5, -1.5, 1.0])
+X[1] = np.array([-0.5, -1.5, 1.0])
+X[2] = np.array([1.5, 0.5, 1.0])
 X[3] = np.array([-1.5, -0.5, 1.0])
 Y[0] = 1
-Y[1] = 1
-Y[2] = -1
+Y[1] = -1
+Y[2] = 1
 Y[3] = -1
 # ==================================
 
 # linear transformation for creating random data points
 M = np.matrix([[1.0, 1.0], [-1.0, 1.0]])
 for i in xrange(4, n):
-    if i % 2 == 0:
+    if i % 2 == 1:
         x_1 = random.uniform(-3.0, -1.0)
         x_2 = random.uniform(-0.5, 0.5)
         X[i][0:2] = M.transpose().dot(np.array([x_1, x_2]))
         Y[i] = -1
     else:
-        assert (i % 2 == 1)
+        assert (i % 2 == 0)
         x_1 = random.uniform(1.0, 3.0)
         x_2 = random.uniform(-0.5, 0.5)
         X[i][0:2] = M.transpose().dot(np.array([x_1, x_2]))
@@ -113,15 +113,25 @@ def loss_landscape(X, Y):
 
 # loss_landscape(X,Y)
 
-gradient_descent(w, X, Y, T)
 
-# w_star = gradient_descent(w,X,Y,T)
-# Xs = np.array([0.1*i - 3 for i in range(60)])
-# Ys = (-w_star[2] - w_star[0]*Xs)/w_star[1]
-# plt.plot(Xs,Ys)
+w_star = gradient_descent(w,X,Y,T)
+print(w_star)
+Xs = np.array([0.1*i - 3 for i in range(60)])
+Ys = (-w_star[2] - w_star[0]*Xs)/w_star[1]
+plt.plot(Xs,Ys,"--")
 
-# Xact = np.array([0.1*i - 3 for i in range(60)])
-# Yact =  - Xact
-# plt.plot(Xact,Yact, 'g^')
+index = np.arange(0,len(X)/2,dtype = int)
+pos = X[index*2]
+neg = X[index*2 + 1]
+# plt.plot(ptsXPos,ptsYPos, 'ro')
+# plt.plot(ptsXNeg,ptsYNeg, 'bs')
+plt.plot(pos.transpose()[0],pos.transpose()[1],'ro')
+plt.plot(neg.transpose()[0],neg.transpose()[1],'bs')
 
-# plt.show()
+Xact = np.array([0.1*i - 3 for i in range(60)])
+Yact =  - Xact
+plt.plot(Xact,Yact, '-')
+plt.axis([-3,3,-3,3])
+# plt.axis('equal')
+
+plt.show()

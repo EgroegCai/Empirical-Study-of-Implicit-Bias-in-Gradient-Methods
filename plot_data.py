@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 steps = np.loadtxt("data/LR/t.out",delimiter=',')
 angles = np.loadtxt("data/LR/angle.out",delimiter=',')
 loss = np.loadtxt("data/LR/loss.out",delimiter=',')
-margin = np.loadtxt("data/LR/margin.out",delimiter=',')
+# margin = np.loadtxt("data/LR/margin.out",delimiter=',')
 mags = np.loadtxt("data/LR/mag.out",delimiter=',')
 
 
@@ -21,8 +21,9 @@ def plot_angle_vs_step(angles,steps):
     plt.show()
     return
 
-def plot_mag_vs_step(mag,steps):
+def plot_mag_vs_step(mags,steps):
     fig2 = plt.figure()
+    mags = mags/mags[-1]
     plt.semilogx(steps,mags)
     plt.title(r"Norm of $w$ versus t")
     plt.xlabel(r"$t$")
@@ -54,4 +55,4 @@ def plot_margin_vs_step(margin,steps):
 plot_angle_vs_step(angles,steps)
 plot_mag_vs_step(mags,steps)
 plot_loss_vs_step(loss,steps)
-plot_margin_vs_step(margin,steps)
+# plot_margin_vs_step(margin,steps)
