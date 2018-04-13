@@ -7,7 +7,7 @@
 *.iml
 out
 gen
-
+data
 # Python
 __pycache__/
 *.py[cod]
