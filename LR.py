@@ -9,7 +9,7 @@ k = 3
 n = 16
 X = np.ones((n, k))
 Y = np.ones(n)
-w = np.ones(k)
+w = np.zeros(k)
 T = int(1e6)
 w_svm = np.array([1 / np.sqrt(2), 1 / np.sqrt(2), 0.0])
 
