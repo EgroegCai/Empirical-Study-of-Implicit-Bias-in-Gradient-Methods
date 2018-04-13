@@ -2,6 +2,7 @@ import math
 import random
 
 import numpy as np
+from numpy.linalg import norm
 
 random.seed(42)
 
@@ -60,34 +61,38 @@ def gradient_descent(w, X, Y, T):
     print("eta = %.4f" % eta)
     angles = []
     mags = []
-    loss = []
+    losses = []
+    margins = []
     base = math.pow(T, 1 / 1e3)
     t_set = set(int(math.pow(base, i)) for i in xrange(1000))
     t_list = sorted(list(t_set))
     print("base = {}".format(base))
-    for t in range(1, T + 1):
+    for t in range(0, T):
         if t in t_set:
-            loss.append(-logistic_regression_loss(w[0],w[1],w[2],X,Y))
-            angle = 1 - np.dot(w_svm, w) / (np.linalg.norm(w_svm) * np.linalg.norm(w))
-            angles.append(angle)
-            mag = np.linalg.norm(w)
+            mag = norm(w[:2])
             mags.append(mag)
-            print("[{}] t = {}, angle = {:g}, mag = {:g}".format(len(mags), t, angle, mag))
+            loss = -logistic_regression_loss(w[0], w[1], w[2], X, Y)
+            losses.append(loss)
+            angle = np.arccos(w_svm[:2].dot(w[:2]) / (norm(w_svm[:2]) * norm(w[:2])))
+            angles.append(angle)
+            # Correct margin is sqrt(2)
+            margin = abs(np.sqrt(2) - np.abs(X[:, :2].dot(w[:2])).min() / norm(w[:2]))
+            margins.append(margin)
+            print("[{:d}] t = {:d}, mag = {:g}, loss = {:g}, angle = {:g}, margin = {:g}"
+                  .format(len(mags), t, mag, loss, angle, margin))
         if t % (T / 10.0) == 0:
             print('{} {}'.format(t, w))
         grad = np.zeros(k)
         for i in xrange(n):
-            # print("WX_%d = %.4f" % (i,(w.transpose().dot(X[i]))))
-            grad += (1 + Y[i]) / 2 * X[i] - np.exp(w.transpose().dot(X[i])) / (
-                    1 + np.exp(w.transpose().dot(X[i]))) * X[i]
+            grad += (1 + Y[i]) / 2 * X[i] - np.exp(X[i].dot(w)) / \
+                    (1 + np.exp(X[i].dot(w))) * X[i]
         # print("grad = ", grad)
-        # we probably need to normalize w to prevent overflow
         w += eta * grad
-        # w = w/np.linalg.norm(w,ord=2)
     np.savetxt('data/LR/t.out', t_list, delimiter=',', fmt='%d')
     np.savetxt('data/LR/angle.out', angles, delimiter=',', fmt='%.6e')
     np.savetxt('data/LR/mag.out', mags, delimiter=',', fmt='%.6e')
-    np.savetxt('data/LR/loss.out', loss, delimiter=',', fmt='%.6e')
+    np.savetxt('data/LR/loss.out', losses, delimiter=',', fmt='%.6e')
+    np.savetxt('data/LR/margin.out', margins, delimiter=',', fmt='%.6e')
     # print(w)
     return w
 
