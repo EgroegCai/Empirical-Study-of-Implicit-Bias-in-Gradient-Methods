@@ -14,10 +14,12 @@ w_star = ws[-1, :]
 
 def plot_w(w):
     print(w)
+    # plot SVM boundary
     Xs = np.array([0.1 * i - 3 for i in range(60)])
     Ys = (-w[2] - w[0] * Xs) / w[1]
-    plt.plot(Xs, Ys, "--")
+    plt.plot(Xs, Ys, "--",label="SVM")
 
+    # plot data points X
     index = np.arange(0, len(X) / 2, dtype=int)
     pos = X[index * 2]
     neg = X[index * 2 + 1]
@@ -26,12 +28,20 @@ def plot_w(w):
     plt.plot(pos.transpose()[0], pos.transpose()[1], 'ro')
     plt.plot(neg.transpose()[0], neg.transpose()[1], 'bs')
 
+    # plot LR decision boundary
     Xact = np.array([0.1 * i - 3 for i in range(60)])
     Yact = - Xact
-    plt.plot(Xact, Yact, '-')
+    plt.plot(Xact, Yact, '-',label="LR")
+
     plt.axis([-3, 3, -3, 3])
     plt.gca().set_aspect('equal')
+    plt.legend(loc="upper left")
+    plt.title("Decision boundary of Logistic Regression on linearly separable dataset")
+    plt.xlabel(r"$x_1$")
+    plt.ylabel(r"$x_2$")
+    plt.savefig("data/LR/LR_sample_data_point.png")
     plt.show()
+
 
 
 def plot_angle_vs_step(angles, steps):
@@ -41,7 +51,7 @@ def plot_angle_vs_step(angles, steps):
     plt.semilogx(steps,angles)
     plt.title(r"Angles between $w$ and $w_{svm}$")
     plt.xlabel(r"$t$")
-    plt.ylabel(r"$\langle w,w_{svm}\rangle/\|w\|\|w_{svm}\|$")
+    plt.ylabel(r"$\langle w,w_{svm}\rangle/(\|w\cdot\|w_{svm}\|)$")
     plt.savefig("data/LR/Angles.png")
     plt.show()
 

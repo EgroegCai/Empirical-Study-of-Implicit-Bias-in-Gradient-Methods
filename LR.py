@@ -1,7 +1,5 @@
 import math
 import random
-
-import matplotlib.pyplot as plt
 import numpy as np
 from numpy.linalg import norm
 
@@ -11,7 +9,8 @@ k = 3
 n = 16
 X = np.ones((n, k))
 Y = np.ones(n)
-w = np.zeros(k)
+w = np.arange(float(k))
+
 T = int(1e6)
 w_svm = np.array([1 / np.sqrt(2), 1 / np.sqrt(2), 0.0])
 
@@ -56,7 +55,7 @@ def logistic_regression_loss(w_1, w_2, w_0, X, Y):
 
 
 def gradient_descent(w, X, Y, T):
-    (U, S, V) = np.linalg.svd(X)
+    (U, S, V) = np.linalg.svd(X[:,:2])
     # we take the inverse of the max singular value as learning rate.
     eta = 1.0 / S[0]
     print("eta = %.4f" % eta)
@@ -72,14 +71,14 @@ def gradient_descent(w, X, Y, T):
     for t in range(0, T):
         if t in t_set:
             ws.append(w.copy())
-            mag = norm(w[:2])
+            mag = norm(w[:])
             mags.append(mag)
             loss = -logistic_regression_loss(w[0], w[1], w[2], X, Y)
             losses.append(loss)
             angle = np.arccos(w_svm[:2].dot(w[:2]) / (norm(w_svm[:2]) * norm(w[:2])))
             angles.append(angle)
             # Correct margin is sqrt(2)
-            margin = abs(np.sqrt(2) - np.abs(X[:, :2].dot(w[:2])).min() / norm(w[:2]))
+            margin = abs(np.sqrt(2) - np.abs(X[:, :].dot(w[:])).min() / norm(w[:2]))
             margins.append(margin)
             print("[{:d}] t = {:d}, w = {}, mag = {:g}, loss = {:g}, angle = {:g}, margin = {:g}"
                   .format(len(mags), t, w, mag, loss, angle, margin))
