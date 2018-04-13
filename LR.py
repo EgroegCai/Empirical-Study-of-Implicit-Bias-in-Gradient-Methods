@@ -60,12 +60,14 @@ def gradient_descent(w, X, Y, T):
     print("eta = %.4f" % eta)
     angles = []
     mags = []
+    loss = []
     base = math.pow(T, 1 / 1e3)
     t_set = set(int(math.pow(base, i)) for i in xrange(1000))
     t_list = sorted(list(t_set))
     print("base = {}".format(base))
     for t in range(1, T + 1):
         if t in t_set:
+            loss.append(-logistic_regression_loss(w[0],w[1],w[2],X,Y))
             angle = 1 - np.dot(w_svm, w) / (np.linalg.norm(w_svm) * np.linalg.norm(w))
             angles.append(angle)
             mag = np.linalg.norm(w)
@@ -85,6 +87,7 @@ def gradient_descent(w, X, Y, T):
     np.savetxt('data/LR/t.out', t_list, delimiter=',', fmt='%d')
     np.savetxt('data/LR/angle.out', angles, delimiter=',', fmt='%.6e')
     np.savetxt('data/LR/mag.out', mags, delimiter=',', fmt='%.6e')
+    np.savetxt('data/LR/loss.out', loss, delimiter=',', fmt='%.6e')
     # print(w)
     return w
 
