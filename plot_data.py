@@ -41,7 +41,7 @@ def plot_angle_vs_step(angles, steps):
     plt.semilogx(steps,angles)
     plt.title(r"Angles between $w$ and $w_{svm}$")
     plt.xlabel(r"$t$")
-    plt.ylabel(r"$\frac{\langle w,w_{svm}\rangle}{\|w\|\|w_{svm}\|}$")
+    plt.ylabel(r"$\langle w,w_{svm}\rangle/\|w\|\|w_{svm}\|$")
     plt.savefig("data/LR/Angles.png")
     plt.show()
 
