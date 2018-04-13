@@ -1,5 +1,6 @@
 import math
 import random
+
 import matplotlib.pyplot as plt
 import numpy as np
 from numpy.linalg import norm
@@ -11,7 +12,7 @@ n = 16
 X = np.ones((n, k))
 Y = np.ones(n)
 w = np.zeros(k)
-T = int(1e3)
+T = int(1e6)
 w_svm = np.array([1 / np.sqrt(2), 1 / np.sqrt(2), 0.0])
 
 # Support vectors
@@ -59,9 +60,10 @@ def gradient_descent(w, X, Y, T):
     # we take the inverse of the max singular value as learning rate.
     eta = 1.0 / S[0]
     print("eta = %.4f" % eta)
-    angles = []
+    ws = []
     mags = []
     losses = []
+    angles = []
     margins = []
     base = math.pow(T, 1 / 1e3)
     t_set = set(int(math.pow(base, i)) for i in xrange(1000))
@@ -69,6 +71,7 @@ def gradient_descent(w, X, Y, T):
     print("base = {}".format(base))
     for t in range(0, T):
         if t in t_set:
+            ws.append(w.copy())
             mag = norm(w[:2])
             mags.append(mag)
             loss = -logistic_regression_loss(w[0], w[1], w[2], X, Y)
@@ -78,8 +81,8 @@ def gradient_descent(w, X, Y, T):
             # Correct margin is sqrt(2)
             margin = abs(np.sqrt(2) - np.abs(X[:, :2].dot(w[:2])).min() / norm(w[:2]))
             margins.append(margin)
-            print("[{:d}] t = {:d}, mag = {:g}, loss = {:g}, angle = {:g}, margin = {:g}"
-                  .format(len(mags), t, mag, loss, angle, margin))
+            print("[{:d}] t = {:d}, w = {}, mag = {:g}, loss = {:g}, angle = {:g}, margin = {:g}"
+                  .format(len(mags), t, w, mag, loss, angle, margin))
         if t % (T / 10.0) == 0:
             print('{} {}'.format(t, w))
         grad = np.zeros(k)
@@ -89,12 +92,11 @@ def gradient_descent(w, X, Y, T):
         # print("grad = ", grad)
         w += eta * grad
     np.savetxt('data/LR/t.out', t_list, delimiter=',', fmt='%d')
-    np.savetxt('data/LR/angle.out', angles, delimiter=',', fmt='%.6e')
+    np.savetxt('data/LR/w.out', ws, delimiter=',', fmt='%.6e')
     np.savetxt('data/LR/mag.out', mags, delimiter=',', fmt='%.6e')
     np.savetxt('data/LR/loss.out', losses, delimiter=',', fmt='%.6e')
+    np.savetxt('data/LR/angle.out', angles, delimiter=',', fmt='%.6e')
     np.savetxt('data/LR/margin.out', margins, delimiter=',', fmt='%.6e')
-    # print(w)
-    return w
 
 
 def loss_landscape(X, Y):
@@ -113,25 +115,5 @@ def loss_landscape(X, Y):
 
 # loss_landscape(X,Y)
 
-
-w_star = gradient_descent(w,X,Y,T)
-print(w_star)
-Xs = np.array([0.1*i - 3 for i in range(60)])
-Ys = (-w_star[2] - w_star[0]*Xs)/w_star[1]
-plt.plot(Xs,Ys,"--")
-
-index = np.arange(0,len(X)/2,dtype = int)
-pos = X[index*2]
-neg = X[index*2 + 1]
-# plt.plot(ptsXPos,ptsYPos, 'ro')
-# plt.plot(ptsXNeg,ptsYNeg, 'bs')
-plt.plot(pos.transpose()[0],pos.transpose()[1],'ro')
-plt.plot(neg.transpose()[0],neg.transpose()[1],'bs')
-
-Xact = np.array([0.1*i - 3 for i in range(60)])
-Yact =  - Xact
-plt.plot(Xact,Yact, '-')
-plt.axis([-3,3,-3,3])
-# plt.axis('equal')
-
-plt.show()
+if __name__ == '__main__':
+    gradient_descent(w, X, Y, T)
