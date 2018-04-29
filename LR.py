@@ -12,7 +12,7 @@ n = 16
 X = np.ones((n, k))
 Y = np.ones(n)
 w = np.zeros(k)
-T = int(1e6)
+T = int(1e7)
 w_svm = np.array([1 / np.sqrt(2), 1 / np.sqrt(2), 0.0])
 
 # Support vectors
@@ -50,7 +50,7 @@ def logistic_regression_loss(w_1, w_2, w_0, X, Y):
     w = [w_1, w_2, w_0]
     res = 0
     for i in xrange(len(Y)):
-        res += np.dot(np.transpose(w), X[i]) * (1 + Y[i]) / 2.0 - np.log(
+        res += - np.dot(np.transpose(w), X[i]) * (1 + Y[i]) / 2.0 + np.log(
             1 + np.exp(np.transpose(w).dot(X[i])))
     return res
 
@@ -74,7 +74,7 @@ def gradient_descent(w, X, Y, T):
             ws.append(w.copy())
             mag = norm(w[:2])
             mags.append(mag)
-            loss = -logistic_regression_loss(w[0], w[1], w[2], X, Y)
+            loss = logistic_regression_loss(w[0], w[1], w[2], X, Y)
             losses.append(loss)
             angle = np.arccos(w_svm[:2].dot(w[:2]) / (norm(w_svm[:2]) * norm(w[:2])))
             angles.append(angle)
@@ -99,18 +99,18 @@ def gradient_descent(w, X, Y, T):
     np.savetxt('data/LR/margin.out', margins, delimiter=',', fmt='%.6e')
 
 
-def loss_landscape(X, Y):
-    w_1 = np.linspace(-100, 100, 100)
-    w_2 = np.linspace(-100, 100, 100)
-    w_0 = np.ones(1000)
-    W_1, W_2 = np.meshgrid(w_1, w_2)
-    l = logistic_regression_loss(W_1, W_2, 1.0, X, Y)
+# def loss_landscape(X, Y):
+#     w_1 = np.linspace(-100, 100, 100)
+#     w_2 = np.linspace(-100, 100, 100)
+#     w_0 = np.ones(1000)
+#     W_1, W_2 = np.meshgrid(w_1, w_2)
+#     l = logistic_regression_loss(W_1, W_2, 1.0, X, Y)
 
-    plt.pcolormesh(W_1, W_2, l, cmap='RdBu')
-    plt.colorbar()
-    plt.xlabel(r"$w_1$")
-    plt.ylabel(r"$w_2$")
-    return
+#     plt.pcolormesh(W_1, W_2, l, cmap='RdBu')
+#     plt.colorbar()
+#     plt.xlabel(r"$w_1$")
+#     plt.ylabel(r"$w_2$")
+#     return
 
 
 # loss_landscape(X,Y)
