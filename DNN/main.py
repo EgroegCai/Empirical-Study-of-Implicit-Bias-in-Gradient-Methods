@@ -53,9 +53,9 @@ optimizer = optim.SGD(classifier.parameters(),lr=0.001,momentum=0.9)
 
 # Train model
 epochs = 10
-trainer = Trainer(classifier,optimizer,criterion,use_cude=torch.cuda.is_available())
+trainer = Trainer(classifier,optimizer,criterion,use_cuda=torch.cuda.is_available())
 
-trainer.train(train_loader,epochs,save_training_gif=True)
+trainer.train(train_loader,epochs)#,save_training_gif=True)
 
 detailer = iter(test_loader)
 images, labels = detailer.next()
@@ -65,8 +65,8 @@ images, labels = detailer.next()
 
 outputs = classifier(Variable(images))
 
-class_correct = list(0. for i in range(10))
-class_total = list(0. for i in range(10))
+class_correct = [0.] * 10
+class_total = [0.] * 10
 for data in test_loader:
     images, labels = data
     outputs = classifier(Variable(images))

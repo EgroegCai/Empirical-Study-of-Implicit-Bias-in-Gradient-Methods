@@ -25,7 +25,8 @@ class Classifier(nn.Module):
         x = x.view(-1, self.num_flat_features(x))
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
-        x = F.Softmax(self.fc3(x))
+        sm = nn.Softmax()
+        x = sm(self.fc3(x))
         return x
 
     def num_flat_features(self, x):
