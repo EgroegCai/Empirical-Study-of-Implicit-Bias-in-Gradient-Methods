@@ -9,15 +9,10 @@ k = 3
 n = 16
 X = np.ones((n, k))
 Y = np.ones(n)
-<<<<<<< HEAD
-w = np.zeros(k)
-T = int(1e7)
-=======
-w = np.arange(float(k))
 
-T = int(1e6)
->>>>>>> master
-w_svm = np.array([1 / np.sqrt(2), 1 / np.sqrt(2), 0.0])
+w = np.arange((float)(k))#np.array([1.0,1.0,0])#np.ones(k)
+T = int(1e7)
+w_svm = np.array([1.0,1.0,0])#np.array([1 / np.sqrt(2),1 / np.sqrt(2), 0.0])
 
 # Support vectors
 # ==================================
