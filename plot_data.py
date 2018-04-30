@@ -55,7 +55,7 @@ def plot_angle_vs_step(angles, steps):
     plt.semilogx(steps,angles)
     plt.title(r"Angles between $w$ and $w_{svm}$")
     plt.xlabel(r"$t$",**axis_font)
-    plt.ylabel(r"$cos^{-1}(\langle w,w_{svm}\rangle/(\|w\cdot\|w_{svm}\|))$",**axis_font)
+    plt.ylabel(r"$cos^{-1}(\langle w,w_{svm}\rangle/(\|w\|\cdot\|w_{svm}\|))$",**axis_font)
     plt.savefig("data/LR/Angles.png")
     plt.show()
 
@@ -63,7 +63,7 @@ def plot_mag_vs_step(mags,steps):
     plt.figure()
     mags = mags/mags[-1]
     plt.semilogx(steps,mags)
-    plt.title(r"Norm of $w$ versus t")
+    plt.title(r"Norm of $w$ versus $t$")
     plt.xlabel(r"$t$",**axis_font)
     plt.ylabel(r"Normalized $\|w(t)\|$",**axis_font)
     plt.savefig("data/LR/Norm_vs_time.png")
@@ -81,7 +81,7 @@ def plot_loss_vs_step(loss,steps):
 def plot_margin_vs_step(margin,steps):
     plt.figure()
     plt.loglog(steps,margin)
-    plt.title(r"Margin Gap versus t")
+    plt.title(r"Margin Gap vs $t$")
     plt.xlabel(r"$t$",**axis_font)
     plt.ylabel(r"Margin Gap",**axis_font)
     plt.savefig("data/LR/margin_vs_time.png")
