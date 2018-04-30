@@ -49,7 +49,7 @@ optimizer = optim.SGD(net.parameters(),lr=0.001,momentum=0.9)
 
 # Train model
 epochs = 10
-trainer = Trainer(classifier,optimizer,use_cude=torch.cuda.is_available())
+trainer = Trainer(classifier,optimizer,criterion,use_cude=torch.cuda.is_available())
 
 trainer.train(train_loader,epochs,save_training_gif=True)
 
