@@ -1,10 +1,14 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import torch
+import torch.nn as nn
+import torch.optim as optim
 import torchvision
 import torchvision.transforms as transforms
+from torch.autograd import Variable
+
 from model import Classifier
 from trainer import Trainer
-import matplotlib.pyplot as plt 
-import torch.optim as optim
-import numpy as np
 
 transform = transforms.Compose(
     [transforms.ToTensor(),
@@ -35,8 +39,8 @@ def imshow(img):
 
 
 # get some random training images
-datailer = iter(train_loader)
-images, labels = dataiter.next()
+# dataiter = iter(train_loader)
+# images, labels = dataiter.next()
 
 # show images
 # imshow(torchvision.utils.make_grid(images))
@@ -44,7 +48,7 @@ images, labels = dataiter.next()
 # print(' '.join('%5s' % classes[labels[j]] for j in range(4)))
 
 criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(net.parameters(),lr=0.001,momentum=0.9)
+optimizer = optim.SGD(classifier.parameters(),lr=0.001,momentum=0.9)
 
 
 # Train model
@@ -59,13 +63,13 @@ images, labels = detailer.next()
 # imshow(torchvision.utils.make_grid(images))
 # print('GroundTruth: ', ' '.join('%5s' % classes[labels[j]] for j in range(4)))
 
-outputs = net(Variable(images))
+outputs = classifier(Variable(images))
 
 class_correct = list(0. for i in range(10))
 class_total = list(0. for i in range(10))
-for data in testloader:
-    images, labels = data 
-    outputs = net(Variable(images))
+for data in test_loader:
+    images, labels = data
+    outputs = classifier(Variable(images))
     _, predicted = torch.max(outputs.data, 1)
     c = (predicted == labels).squeeze()
     for i in range(4):

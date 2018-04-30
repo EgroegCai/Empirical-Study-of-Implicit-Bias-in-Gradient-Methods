@@ -1,8 +1,5 @@
-import torch
 from torch.autograd import Variable
-import torch.nn as nn
-import torch.nn.functional as F
-import numpy as np
+
 
 class Trainer():
     def __init__(self, classifier, optimizer, loss, print_every=50, use_cuda=False):
