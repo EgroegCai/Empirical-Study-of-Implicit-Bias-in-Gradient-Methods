@@ -23,9 +23,12 @@ class Trainer():
             inputs, labels = Variable(inputs), Variable(labels)
             if self.use_cuda:
                 inputs = inputs.cuda()
+                labels = labels.cuda()
 
             self.opt.zero_grad()
             outputs = self.classifier(inputs)
+            if self.use_cuda:
+                outputs = outputs.cuda()
             loss = self.loss_fn(outputs, labels)
             loss.backward()
             self.opt.step()

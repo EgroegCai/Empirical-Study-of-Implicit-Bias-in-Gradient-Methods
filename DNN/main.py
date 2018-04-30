@@ -76,6 +76,9 @@ if __name__ == '__main__':
         train_class_total = 0.
         for data in train_loader:
             images, labels = data
+            if use_cuda:
+                images = images.cuda()
+                labels = labels.cuda()
             outputs = classifier(Variable(images))
             _, predicted = torch.max(outputs.data, 1)            
             train_class_correct += (predicted == labels).sum()
@@ -89,6 +92,7 @@ if __name__ == '__main__':
             inputs, labels = Variable(inputs), Variable(labels)
             if use_cuda:
                 inputs = inputs.cuda()
+                labels = labels.cuda()
             outputs = classifier(inputs)
             loss = criterion(outputs, labels)
             test_loss += loss.data[0]
@@ -99,6 +103,9 @@ if __name__ == '__main__':
         test_class_total = 0.
         for data in test_loader:
             images, labels = data
+            if use_cuda:
+                images = images.cuda()
+                labels = labels.cuda()            
             outputs = classifier(Variable(images))
             _, predicted = torch.max(outputs.data, 1)            
             test_class_correct += (predicted == labels).sum()
