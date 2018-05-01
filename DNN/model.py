@@ -7,7 +7,7 @@ class Classifier(nn.Module):
         super(Classifier, self).__init__()
         # 3 input image channel, 6 output channels, 5x5 square convolution
         # kernel
-        self.conv1 = nn.Conv2d(3, 6, 5)
+        self.conv1 = nn.Conv2d(img_size[2], 6, 5)
         self.conv2 = nn.Conv2d(6, 16, 5)
         # an affine operation: y = Wx + b
         # image begins with size (32,32,3), its sides' dimension reduce by 4 for each convolution
@@ -24,9 +24,9 @@ class Classifier(nn.Module):
         x = F.max_pool2d(F.relu(self.conv2(x)), 2)
         x = x.view(-1, self.num_flat_features(x))
         x = F.relu(self.fc1(x))
-        x = F.relu(self.fc2(x))
-        sm = nn.Softmax()
-        x = sm(self.fc3(x))
+        x = F.relu(self.fc2(x))        
+        x = self.fc3(x)
+
         return x
 
     def num_flat_features(self, x):

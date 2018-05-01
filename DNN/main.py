@@ -56,18 +56,21 @@ if __name__ == '__main__':
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(classifier.parameters(),lr=0.001,momentum=0.9)
+    # optimizer = optim.Adam(classifier.parameters(),lr=0.001)
 
 
     # Train model
     f = open('../data/DNN/result.txt','w')
-    epochs = 2
+    epochs = 4000
+    last_train = 0
+    last_test = 0
     trainer = Trainer(classifier,optimizer,criterion,use_cuda=use_cuda)
     print(trainer)
     for epoch in range(epochs):
         print("epoch = %d" % epoch)
         train_loss = trainer.train_epoch(train_loader)#,save_training_gif=True)
         # L2_norm
-        norm = list(classifier.parameters())[-2].norm(2)        
+        norm = list(classifier.parameters())[-1].norm(2)        
         print('Norm of last hidden layer: %f' % norm)
         # training loss        
         print('Training Loss: %f' % train_loss)
@@ -83,11 +86,12 @@ if __name__ == '__main__':
             _, predicted = torch.max(outputs.data, 1)            
             train_class_correct += (predicted == labels).sum()
             train_class_total += batch_size
-            train_err = 1 - train_class_correct / train_class_total        
+        train_err = 1 - train_class_correct / train_class_total
+                 
         print('Training error: %.2f %%' % (100*train_err))
         # test loss
         test_loss = 0.0
-        for _,data in enumerate(test_loader,0):
+        for data in test_loader:
             inputs, labels = data
             inputs, labels = Variable(inputs), Variable(labels)
             if use_cuda:
@@ -126,4 +130,4 @@ if __name__ == '__main__':
     # print('GroundTruth: ', ' '.join('%5s' % classes[labels[j]] for j in range(4)))
 
     # outputs = classifier(Variable(images))
-    print('DONE')
+    print('DONE.')
