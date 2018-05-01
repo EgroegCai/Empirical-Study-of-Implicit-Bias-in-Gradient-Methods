@@ -1,5 +1,9 @@
+"""Train LR and generate data."""
+
 import math
+import os
 import random
+
 import numpy as np
 from numpy.linalg import norm
 
@@ -10,9 +14,9 @@ n = 16
 X = np.ones((n, k))
 Y = np.ones(n)
 
-w = np.arange((float)(k))#np.array([1.0,1.0,0])#np.ones(k)
-T = int(1e7)
-w_svm = np.array([1.0,1.0,0])#np.array([1 / np.sqrt(2),1 / np.sqrt(2), 0.0])
+w0 = np.arange(float(k))  # np.array([1.0,1.0,0])#np.ones(k)
+T = int(1e6)
+w_svm = np.array([1.0, 1.0, 0])  # np.array([1 / np.sqrt(2),1 / np.sqrt(2), 0.0])
 
 # Support vectors
 # ==================================
@@ -54,8 +58,18 @@ def logistic_regression_loss(w_1, w_2, w_0, X, Y):
     return res
 
 
-def gradient_descent(w, X, Y, T):
-    (U, S, V) = np.linalg.svd(X[:,:2])
+def gradient_descent(w0, X, Y, T, data_dir, gamma=None):
+    """
+    Train LR with GD and save data.
+    :param w0: initial weights
+    :param X: training points
+    :param Y: training labels
+    :param T: number of GD steps
+    :param data_dir: where to save data
+    :param gamma: None (without momentum), or gamma value
+    """
+    w = w0.copy()
+    (U, S, V) = np.linalg.svd(X[:, :2])
     # we take the inverse of the max singular value as learning rate.
     eta = 1.0 / S[0]
     print("eta = %.4f" % eta)
@@ -68,6 +82,7 @@ def gradient_descent(w, X, Y, T):
     t_set = set(int(math.pow(base, i)) for i in xrange(1000))
     t_list = sorted(list(t_set))
     print("base = {}".format(base))
+    dw = 0.0
     for t in range(0, T):
         if t in t_set:
             ws.append(w.copy())
@@ -82,20 +97,27 @@ def gradient_descent(w, X, Y, T):
             margins.append(margin)
             print("[{:d}] t = {:d}, w = {}, mag = {:g}, loss = {:g}, angle = {:g}, margin = {:g}"
                   .format(len(mags), t, w, mag, loss, angle, margin))
-        if t % (T / 10.0) == 0:
+        if t % (T // 10) == 0:
             print('{} {}'.format(t, w))
+        # grad is d(loss)/dw
         grad = np.zeros(k)
         for i in xrange(n):
-            grad += (1 + Y[i]) / 2 * X[i] - np.exp(X[i].dot(w)) / \
-                    (1 + np.exp(X[i].dot(w))) * X[i]
+            ex = np.exp(X[i].dot(w))
+            grad += -(1 + Y[i]) / 2.0 * X[i] + ex / (1 + ex) * X[i]
         # print("grad = ", grad)
-        w += eta * grad
-    np.savetxt('data/LR/t.out', t_list, delimiter=',', fmt='%d')
-    np.savetxt('data/LR/w.out', ws, delimiter=',', fmt='%.6e')
-    np.savetxt('data/LR/mag.out', mags, delimiter=',', fmt='%.6e')
-    np.savetxt('data/LR/loss.out', losses, delimiter=',', fmt='%.6e')
-    np.savetxt('data/LR/angle.out', angles, delimiter=',', fmt='%.6e')
-    np.savetxt('data/LR/margin.out', margins, delimiter=',', fmt='%.6e')
+        if gamma is None:
+            dw = -eta * grad
+        else:
+            dw = gamma * dw - eta * grad
+        w += dw
+    out_list = [('t', t_list, '%d'),
+                ('w', ws, '%.6e'),
+                ('mag', mags, '%.6e'),
+                ('loss', losses, '%.6e'),
+                ('angle', angles, '%.6e'),
+                ('margin', margins, '%.6e')]
+    for name, var, fmt in out_list:
+        np.savetxt(os.path.join(data_dir, name + '.out'), var, delimiter=',', fmt=fmt)
 
 
 # def loss_landscape(X, Y):
@@ -114,5 +136,28 @@ def gradient_descent(w, X, Y, T):
 
 # loss_landscape(X,Y)
 
+# RUNS = [('GD', {'gamma': None}),
+#         ('GDMO', {'gamma': 0.9})]
+
+RUNS = [('GD', None),
+        ('GDMO.9', 0.9),
+        ('GDMO.5', 0.5)]
+
+
+def main():
+    def mkdirs(s):
+        if not os.path.isdir(s):
+            os.makedirs(s)
+
+    os.chdir(os.path.dirname(__file__))
+    root_dir = '../data/LR'
+
+    for name, gamma in RUNS:
+        data_dir = os.path.join(root_dir, name)
+        mkdirs(data_dir)
+        print(name)
+        gradient_descent(w0, X, Y, T, data_dir, gamma=gamma)
+
+
 if __name__ == '__main__':
-    gradient_descent(w, X, Y, T)
+    main()
