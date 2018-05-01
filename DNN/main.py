@@ -16,9 +16,9 @@ def imshow(img):
     plt.imshow(np.transpose(npimg, (1, 2, 0)))
 
 if __name__ == '__main__':
-
+    epochs = 4000
     batch_size = 4
-    use_cuda = torch.cuda.is_available()
+    use_cuda = False#torch.cuda.is_available()
 
     transform = transforms.Compose(
         [transforms.ToTensor(),
@@ -60,7 +60,8 @@ if __name__ == '__main__':
 
     # Train model
     f = open('../data/DNN/result.txt','w')
-    epochs = 2
+    tempf = open('../data/DNN/classification.txt','w')
+
     trainer = Trainer(classifier,optimizer,criterion,use_cuda=use_cuda)
     print(trainer)
     for epoch in range(epochs):
@@ -72,19 +73,28 @@ if __name__ == '__main__':
         # training loss        
         print('Training Loss: %f' % train_loss)
         # training error
-        train_class_correct = 0.
-        train_class_total = 0.
+        train_class_correct = 0.0
+        train_class_total = 0.0
+        tempf.write("epoch %f\n" %(epoch))
+        tempf.write("training predictions\n")
+        tempf.flush()
         for data in train_loader:
             images, labels = data
             if use_cuda:
                 images = images.cuda()
                 labels = labels.cuda()
             outputs = classifier(Variable(images))
-            _, predicted = torch.max(outputs.data, 1)            
-            train_class_correct += (predicted == labels).sum()
+            _, predicted = torch.max(outputs.data, 1)
+            tempf.write(predicted.numpy().__repr__())     
+            tempf.write("\n")  
+            tempf.flush() 
+            train_class_correct += (predicted == labels).sum().item()
             train_class_total += batch_size
-            train_err = 1 - train_class_correct / train_class_total        
-        print('Training error: %.2f %%' % (100*train_err))
+        train_err = 1.0 - train_class_correct / train_class_total
+        print('Training error: %f %%' % (100*train_err))
+
+        tempf.write("testing predictions\n")
+        tempf.flush()
         # test loss
         test_loss = 0.0
         for _,data in enumerate(test_loader,0):
@@ -99,24 +109,29 @@ if __name__ == '__main__':
         test_loss = test_loss / len(test_loader)
         print("Test_loss: %f" % test_loss)
         # validation accuracy
-        test_class_correct = 0.
-        test_class_total = 0.
+        test_class_correct = 0.0
+        test_class_total = 0.0
         for data in test_loader:
             images, labels = data
             if use_cuda:
                 images = images.cuda()
                 labels = labels.cuda()            
             outputs = classifier(Variable(images))
-            _, predicted = torch.max(outputs.data, 1)            
-            test_class_correct += (predicted == labels).sum()
+
+            _, predicted = torch.max(outputs.data, 1)
+            tempf.write(predicted.numpy().__repr__()) 
+            tempf.write("\n")         
+            tempf.flush()      
+            test_class_correct += (predicted == labels).sum().item()
             test_class_total += batch_size
-        test_err = 1 - test_class_correct / test_class_total
-        print('Test error: %.2f %%' % (100*test_err))
+        test_err = 1.0 - test_class_correct / test_class_total
+        print('Test error: %f %%' % (100*test_err))
         f.write('%f,%f,%f,%f,%f\n' % (norm, train_loss, train_err, test_loss, test_err))
         f.flush()
         
     print('Finished Training')    
     f.close()
+    tempf.close()
     checkpoint = [50,100,200,400,2000,4000]
 
     detailer = iter(test_loader)
